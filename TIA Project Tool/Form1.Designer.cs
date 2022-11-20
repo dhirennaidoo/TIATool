@@ -44,11 +44,11 @@
             this.cmboDevices = new System.Windows.Forms.ComboBox();
             this.tvMasterCopies = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnRetrieveMasterCopies = new System.Windows.Forms.Button();
             this.lvInstances = new System.Windows.Forms.ListView();
             this.btnPaste = new System.Windows.Forms.Button();
             this.btnGenerateInstances = new System.Windows.Forms.Button();
             this.grpInstances = new System.Windows.Forms.GroupBox();
-            this.btnRetrieveMasterCopies = new System.Windows.Forms.Button();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
@@ -234,6 +234,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Master Copies";
             // 
+            // btnRetrieveMasterCopies
+            // 
+            this.btnRetrieveMasterCopies.Location = new System.Drawing.Point(7, 20);
+            this.btnRetrieveMasterCopies.Name = "btnRetrieveMasterCopies";
+            this.btnRetrieveMasterCopies.Size = new System.Drawing.Size(75, 23);
+            this.btnRetrieveMasterCopies.TabIndex = 5;
+            this.btnRetrieveMasterCopies.Text = "Refresh";
+            this.btnRetrieveMasterCopies.UseVisualStyleBackColor = true;
+            this.btnRetrieveMasterCopies.Click += new System.EventHandler(this.btnRetrieveMasterCopies_Click);
+            // 
             // lvInstances
             // 
             this.lvInstances.Alignment = System.Windows.Forms.ListViewAlignment.Left;
@@ -275,15 +285,6 @@
             this.grpInstances.TabIndex = 9;
             this.grpInstances.TabStop = false;
             this.grpInstances.Text = "Instances";
-            // 
-            // btnRetrieveMasterCopies
-            // 
-            this.btnRetrieveMasterCopies.Location = new System.Drawing.Point(7, 20);
-            this.btnRetrieveMasterCopies.Name = "btnRetrieveMasterCopies";
-            this.btnRetrieveMasterCopies.Size = new System.Drawing.Size(75, 23);
-            this.btnRetrieveMasterCopies.TabIndex = 5;
-            this.btnRetrieveMasterCopies.Text = "Refresh";
-            this.btnRetrieveMasterCopies.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 

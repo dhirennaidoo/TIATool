@@ -14,13 +14,36 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 
-using Siemens.Engineering;
-using Siemens.Engineering.Compiler;
-using Siemens.Engineering.Hmi;
-using Siemens.Engineering.HW;
-using Siemens.Engineering.HW.Features;
-using Siemens.Engineering.SW;
+//Siemens includes
 using Siemens.Engineering.Multiuser;
+using Siemens.Engineering;
+using Siemens.Engineering.Cax;
+using Siemens.Engineering.Compiler;
+using Siemens.Engineering.Compare;
+using Siemens.Engineering.Download;
+using Siemens.Engineering.Hmi;
+using Siemens.Engineering.Hmi.Cycle;
+using Siemens.Engineering.Hmi.Communication;
+using Siemens.Engineering.Hmi.Globalization;
+using Siemens.Engineering.Hmi.RuntimeScripting;
+using Siemens.Engineering.Hmi.Screen;
+using Siemens.Engineering.Hmi.Tag;
+using Siemens.Engineering.Hmi.TextGraphicList;
+using Siemens.Engineering.HW;
+using Siemens.Engineering.HW.Extensions;
+using Siemens.Engineering.HW.Features;
+using Siemens.Engineering.HW.Utilities;
+using Siemens.Engineering.Library;
+using Siemens.Engineering.Library.MasterCopies;
+using Siemens.Engineering.Library.Types;
+using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.ExternalSources;
+using Siemens.Engineering.SW.Tags;
+using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.TechnologicalObjects.Motion;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.Upload;
 
 namespace TIA_Project_Tool
 {
@@ -377,10 +400,20 @@ namespace TIA_Project_Tool
             PlcSoftware plcs = null;
             Siemens.Engineering.Library.MasterCopies.MasterCopy mc = null;
 
+            //TODO: Find complete structure, in case it is nested
+            string strSelectedMasterCopy = tvMasterCopies.SelectedNode.Text;
+
             if (MyProject != null)
             {
-                plcs = GetPlcSoftware(MyProject.Devices[0]);
-                mc = MyProject.ProjectLibrary.MasterCopyFolder.MasterCopies.Find("Motor call");
+                foreach (Device plc in MyProject.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+                mc = MyProject.ProjectLibrary.MasterCopyFolder.MasterCopies.Find(strSelectedMasterCopy);
             }
 
             if (MyLocalSession != null)
@@ -393,7 +426,7 @@ namespace TIA_Project_Tool
                         break;
                     }
                 }
-                mc = MyLocalSession.Project.ProjectLibrary.MasterCopyFolder.MasterCopies.Find("Motor call");
+                mc = MyLocalSession.Project.ProjectLibrary.MasterCopyFolder.MasterCopies.Find(strSelectedMasterCopy);
             }
 
             //Convert ListViewItem to string list
@@ -408,6 +441,61 @@ namespace TIA_Project_Tool
                     newBlock.Name = instance;
                 }
             }
+        }
+
+        private TreeNode getMCFolderAsTreeNode(MasterCopyFolder mcsf)
+        {
+            TreeNode newNode = new TreeNode(mcsf.Name);
+
+            //Get all sub-folders
+            foreach (MasterCopyUserFolder mcuf in mcsf.Folders)
+            {
+                TreeNode folderNode = getMCFolderAsTreeNode(mcuf);
+                newNode.Nodes.Add(folderNode);
+            }
+
+            foreach (MasterCopy mc in mcsf.MasterCopies)
+            {
+                newNode.Nodes.Add(mc.Name);
+            }
+
+            return newNode;
+        }
+
+        private void btnRetrieveMasterCopies_Click(object sender, EventArgs e)
+        {
+            PlcSoftware plcs = null;
+            MasterCopySystemFolder mcsf = null;
+
+            if (MyProject != null)
+            {
+                foreach (Device plc in MyProject.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+                mcsf = MyProject.ProjectLibrary.MasterCopyFolder;
+            }
+
+            if (MyLocalSession != null)
+            {
+                foreach (Device plc in MyLocalSession.Project.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+                mcsf = MyLocalSession.Project.ProjectLibrary.MasterCopyFolder;
+            }
+
+            //Process mcsf
+
+            tvMasterCopies.Nodes.Add(getMCFolderAsTreeNode(mcsf));
         }
     }
 }
