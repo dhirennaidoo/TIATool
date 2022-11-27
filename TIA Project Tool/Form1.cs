@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Xml.Linq;
 
 //Siemens includes
 using Siemens.Engineering.Multiuser;
@@ -394,6 +395,68 @@ namespace TIA_Project_Tool
             }
         }
 
+        /// <summary>
+        /// This will iterate through all devices in the project or local session
+        /// and return the one that matches the selected device
+        /// </summary>
+        private Device GetDevice()
+        {
+            Device dvc = null;
+
+            if (MyProject != null)
+            {
+                foreach (Device plc in MyProject.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        dvc = plc;
+                        break;
+                    }
+                }
+            }
+
+            if (MyLocalSession != null)
+            {
+                foreach (Device plc in MyLocalSession.Project.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        dvc = plc;
+                        break;
+                    }
+                }
+            }
+            return dvc;
+        }
+
+        private bool StartCompile()
+        {
+            Device dvcCpu = GetDevice();
+            ICompilable compileServiceSwCpu = dvcCpu.GetService<ICompilable>();
+            CompilerResult compileResultSwCpu = compileServiceSwCpu.Compile();
+            bool compileCheck = !compileResultSwCpu.State.Equals(CompilerResultState.Error);
+            return compileCheck;
+        }
+
+        private string getInstanceDBName(string strInstanceName)
+            { return "DB" + strInstanceName; }
+
+        //==========XML handling==========
+        private void modifyXML(string strPath,string strPlaceholder,string strNewName)
+        {
+            //Still unsure if all modifications should be done here
+            //IO should also be replaced here
+
+            XDocument doc = XDocument.Load(strPath);
+
+            string strInstanceDBName = getInstanceDBName(strNewName);
+
+            var docText = doc.ToString().Replace(strPlaceholder, strInstanceDBName);
+            using (var reader = new StringReader(docText))
+                doc = XDocument.Load(reader, LoadOptions.None);
+
+            doc.Save(strPath);
+        }
         private void btnGenerateInstances_Click(object sender, EventArgs e)
         {
             //Of course this damn thing has no empty constructor, FFS
@@ -402,6 +465,7 @@ namespace TIA_Project_Tool
 
             //TODO: Find complete structure, in case it is nested
             string strSelectedMasterCopy = tvMasterCopies.SelectedNode.Text;
+            string strPlaceholder = Toolbox.getXMLPlaceholder(cmboInstanceType.Text);
 
             if (MyProject != null)
             {
@@ -439,10 +503,37 @@ namespace TIA_Project_Tool
                 {
                     Siemens.Engineering.SW.Blocks.PlcBlock newBlock = plcs.BlockGroup.Blocks.CreateFrom(mc);
                     newBlock.Name = instance;
+                    string strExportPath = @"C:\TIATool\" + newBlock.Name + ".xml";
+
+                    if (!newBlock.IsConsistent)
+                    {
+                        bool compileResult = StartCompile();
+                    }
+
+                    if (File.Exists(strExportPath))
+                    {
+                        File.Delete(strExportPath);
+                    }
+
+
+                    //Export XML
+                    newBlock.Export(new FileInfo(strExportPath),ExportOptions.None);
+
+                    //Replace instance references
+                    modifyXML(strExportPath, strPlaceholder, newBlock.Name);
+
+                    //Import modified XML
+                    plcs.BlockGroup.Blocks.Import(new FileInfo(strExportPath), ImportOptions.Override);
                 }
             }
         }
 
+
+        /// <summary>
+        /// This function accepts a <c>MasterCopyFolder</c> parameter and
+        /// browses it, forming a TreeNode that represents the structure.
+        /// </summary>
+        /// <param name="mcsf">Master Copies folder</param>
         private TreeNode getMCFolderAsTreeNode(MasterCopyFolder mcsf)
         {
             TreeNode newNode = new TreeNode(mcsf.Name);
@@ -454,15 +545,63 @@ namespace TIA_Project_Tool
                 newNode.Nodes.Add(folderNode);
             }
 
+            //Get all master copies
             foreach (MasterCopy mc in mcsf.MasterCopies)
             {
-                newNode.Nodes.Add(mc.Name);
+                TreeNode tn = new TreeNode(mc.Name);
+                //Make it clear this is the copy and not a folder
+                tn.NodeFont = new Font(tvMasterCopies.Font, FontStyle.Bold);    
+                newNode.Nodes.Add(tn);
             }
 
             return newNode;
         }
 
-        private void btnRetrieveMasterCopies_Click(object sender, EventArgs e)
+        private void btnGenerateInstanceDBs_Click(object sender, EventArgs e)
+        {
+            PlcSoftware plcs = null;
+
+            if (MyProject != null)
+            {
+                foreach (Device plc in MyProject.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+            }
+
+            if (MyLocalSession != null)
+            {
+                foreach (Device plc in MyLocalSession.Project.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+            }
+
+            //Convert ListViewItem to string list
+            List<string> strInstances = lvInstances.Items.Cast<ListViewItem>().Select(item => item.Text).ToList();
+
+            foreach (string instance in strInstances)
+            {
+                //filter block names out here
+                if (instance.Length > 0)
+                {
+                    string strInstanceDBName = "DB" + instance;
+                    plcs.BlockGroup.Blocks.CreateInstanceDB(strInstanceDBName, true, 1, cmboInstanceType.SelectedItem.ToString());
+                }
+            }
+
+
+        }
+
+        private void btnRetrieveMasterCopies_Click_1(object sender, EventArgs e)
         {
             PlcSoftware plcs = null;
             MasterCopySystemFolder mcsf = null;
@@ -496,6 +635,40 @@ namespace TIA_Project_Tool
             //Process mcsf
 
             tvMasterCopies.Nodes.Add(getMCFolderAsTreeNode(mcsf));
+        }
+    }
+
+    public class Toolbox
+    {
+        public static string getXMLPlaceholder(string strInstanceType)
+        {
+            string strPlaceholder = "";
+            switch (strInstanceType)
+            {
+                case "$AnalogInput":
+                    strPlaceholder = "DB100AI100";
+                    break;
+                case "$AnalogOutput":
+                    strPlaceholder = "DB100AO100";
+                    break;
+                case "$DigitalInput":
+                    strPlaceholder = "DB100DI100";
+                    break;
+                case "$DigitalOutput":
+                    strPlaceholder = "DB100DO100";
+                    break;
+                case "$Motor":
+                    strPlaceholder = "DB100M100";
+                    break;
+                case "$Valve":
+                    strPlaceholder = "DB100V100";
+                    break;
+                default:
+                    strPlaceholder = "DB100M100";
+                    break;
+            }
+
+            return strPlaceholder;
         }
     }
 }
