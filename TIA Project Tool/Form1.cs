@@ -372,9 +372,29 @@ namespace TIA_Project_Tool
                 cb = cb.Replace("\n", "");
                 string[] lines = cb.Split('\r');
 
+                //Get first line to check columns
+                string[] strFirstRow = lines[0].Split('\t');
+                if (strFirstRow.Length == 1)
+                {
+                    MessageBox.Show("No instance DB type column detected. Using dropdown instead");
+                }
+
                 foreach (string line in lines)
                 {
-                    lvInstances.Items.Add(line);
+                    string[] strInstanceData = line.Split('\t');
+
+                    ListViewItem lviInstance = new ListViewItem(strInstanceData[0]);
+
+                    if (strInstanceData.Length > 1)
+                    {
+                        lviInstance.SubItems.Add(strInstanceData[1]);
+                    }
+                    else
+                    {
+                        lviInstance.SubItems.Add(cmboInstanceType.Text);
+                    }
+
+                    lvInstances.Items.Add(lviInstance);
                 }
                 //IEnumerable items = (IEnumerable)ido.GetData("ListViewItems");
                 //if (items != null)
@@ -439,7 +459,7 @@ namespace TIA_Project_Tool
         }
 
         private string getInstanceDBName(string strInstanceName)
-            { return "DB" + strInstanceName; }
+            { return txtInstancePrefix.Text + strInstanceName; }
 
         //==========XML handling==========
         private void modifyXML(string strPath,string strPlaceholder,string strNewName)
@@ -588,13 +608,14 @@ namespace TIA_Project_Tool
             //Convert ListViewItem to string list
             List<string> strInstances = lvInstances.Items.Cast<ListViewItem>().Select(item => item.Text).ToList();
 
-            foreach (string instance in strInstances)
+            //Assume first column is the instance name, and the second column contains the type
+            foreach (ListViewItem lvi in lvInstances.Items)
             {
                 //filter block names out here
-                if (instance.Length > 0)
+                if (lvi.Text.Length > 0)
                 {
-                    string strInstanceDBName = "DB" + instance;
-                    plcs.BlockGroup.Blocks.CreateInstanceDB(strInstanceDBName, true, 1, cmboInstanceType.SelectedItem.ToString());
+                    string strInstanceDBName = txtInstancePrefix.Text + lvi.SubItems[0].Text;
+                    plcs.BlockGroup.Blocks.CreateInstanceDB(strInstanceDBName, true, 1, lvi.SubItems[1].Text);
                 }
             }
 
@@ -635,6 +656,123 @@ namespace TIA_Project_Tool
             //Process mcsf
 
             tvMasterCopies.Nodes.Add(getMCFolderAsTreeNode(mcsf));
+        }
+
+        private void btnRefreshDBFlattener_Click(object sender, EventArgs e)
+        {
+            PlcSoftware plcs = null;
+
+            if (MyProject != null)
+            {
+                foreach (Device plc in MyProject.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+            }
+
+            if (MyLocalSession != null)
+            {
+                foreach (Device plc in MyLocalSession.Project.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+            }
+
+            //Create root node
+            TreeNode rootNode = new TreeNode("Program Blocks");
+
+            PlcBlockUserGroupComposition pbugc = plcs.BlockGroup.Groups;
+            foreach (PlcBlockUserGroup blockUserGroup in pbugc)
+            {
+                rootNode.Nodes.Add(getProgamBlocksFolderAsTreeNode(blockUserGroup));
+            }
+            tvDBFlattener.Nodes.Add(rootNode);
+        }
+
+        private TreeNode getProgamBlocksFolderAsTreeNode(PlcBlockUserGroup pbug)
+        {
+            TreeNode newNode = new TreeNode(pbug.Name);
+
+            //Get all sub-folders
+            foreach (PlcBlockUserGroup SubFolder in pbug.Groups)
+            {
+                TreeNode folderNode = getProgamBlocksFolderAsTreeNode(SubFolder);
+                newNode.Nodes.Add(folderNode);
+            }
+
+            //Get all master copies
+            foreach (PlcBlock block in pbug.Blocks)
+            {
+                TreeNode tn = new TreeNode(block.Name);
+                //Make it clear this is the copy and not a folder
+                tn.NodeFont = new Font(tvMasterCopies.Font, FontStyle.Bold);
+                newNode.Nodes.Add(tn);
+            }
+
+            return newNode;
+        }
+
+        private void btnFlattenDB_Click(object sender, EventArgs e)
+        {
+            PlcSoftware plcs = null;
+
+            if (MyProject != null)
+            {
+                foreach (Device plc in MyProject.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+            }
+
+            if (MyLocalSession != null)
+            {
+                foreach (Device plc in MyLocalSession.Project.Devices)
+                {
+                    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                    {
+                        plcs = GetPlcSoftware(plc);
+                        break;
+                    }
+                }
+            }
+
+            string strDBPath = tvDBFlattener.SelectedNode.FullPath;
+            PlcBlock db = getBlock(plcs, strDBPath);
+
+            string strExportPath = @"C:\TIATool\export.xml";
+            ExportOptions eo = new ExportOptions();
+            db.Export(new FileInfo(strExportPath), ExportOptions.None);
+
+        }
+
+        private PlcBlock getBlock(PlcSoftware plcs, string strBlockPath)
+        {
+            string[] pathParts = strBlockPath.Split(new [] { "\\" }, StringSplitOptions.None);
+            string strBlockName = pathParts.Last();
+
+            PlcBlockUserGroupComposition pbugc = plcs.BlockGroup.Groups;
+            PlcBlockUserGroup pbug = pbugc.Find(pathParts[1]);
+            foreach (string grp in pathParts)
+            {
+                if ((grp != strBlockName) && (grp != pathParts[0]) && (grp != pathParts[1]))
+                {
+                    pbug = pbug.Groups.Find(grp);
+                }
+            }
+            PlcBlock b = pbug.Blocks.Find(strBlockName);
+            return b;
         }
     }
 

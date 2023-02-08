@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.grpPortal = new System.Windows.Forms.GroupBox();
             this.btnCloseTIAPortal = new System.Windows.Forms.Button();
             this.btnStartTIAPortal = new System.Windows.Forms.Button();
@@ -40,9 +41,15 @@
             this.btnConnectProject = new System.Windows.Forms.Button();
             this.btnOpenProj = new System.Windows.Forms.Button();
             this.grpDeviceSelection = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtInstancePrefix = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cmboInstanceType = new System.Windows.Forms.ComboBox();
             this.cmboBlockList = new System.Windows.Forms.ComboBox();
             this.cmboDevices = new System.Windows.Forms.ComboBox();
             this.lvInstances = new System.Windows.Forms.ListView();
+            this.colInstanceName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnPaste = new System.Windows.Forms.Button();
             this.btnGenerateInstances = new System.Windows.Forms.Button();
             this.grpInstances = new System.Windows.Forms.GroupBox();
@@ -53,8 +60,10 @@
             this.tvMasterCopies = new System.Windows.Forms.TreeView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.btnGenerateInstanceDBs = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.cmboInstanceType = new System.Windows.Forms.ComboBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.btnRefreshDBFlattener = new System.Windows.Forms.Button();
+            this.tvDBFlattener = new System.Windows.Forms.TreeView();
+            this.btnFlattenDB = new System.Windows.Forms.Button();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
@@ -63,6 +72,7 @@
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpPortal
@@ -196,6 +206,8 @@
             // 
             // grpDeviceSelection
             // 
+            this.grpDeviceSelection.Controls.Add(this.label2);
+            this.grpDeviceSelection.Controls.Add(this.txtInstancePrefix);
             this.grpDeviceSelection.Controls.Add(this.label1);
             this.grpDeviceSelection.Controls.Add(this.cmboInstanceType);
             this.grpDeviceSelection.Controls.Add(this.cmboBlockList);
@@ -206,6 +218,46 @@
             this.grpDeviceSelection.TabIndex = 3;
             this.grpDeviceSelection.TabStop = false;
             this.grpDeviceSelection.Text = "Device";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(229, 84);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(95, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Instance DB Prefix";
+            // 
+            // txtInstancePrefix
+            // 
+            this.txtInstancePrefix.Location = new System.Drawing.Point(328, 81);
+            this.txtInstancePrefix.Name = "txtInstancePrefix";
+            this.txtInstancePrefix.Size = new System.Drawing.Size(100, 20);
+            this.txtInstancePrefix.TabIndex = 4;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 84);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(93, 13);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Instance DB Type";
+            // 
+            // cmboInstanceType
+            // 
+            this.cmboInstanceType.FormattingEnabled = true;
+            this.cmboInstanceType.Items.AddRange(new object[] {
+            "$Motor",
+            "$Valve",
+            "$AnalogInput",
+            "$AnalogOutput",
+            "$DigitalInput",
+            "$DigitalOutput"});
+            this.cmboInstanceType.Location = new System.Drawing.Point(105, 81);
+            this.cmboInstanceType.Name = "cmboInstanceType";
+            this.cmboInstanceType.Size = new System.Drawing.Size(121, 21);
+            this.cmboInstanceType.TabIndex = 2;
             // 
             // cmboBlockList
             // 
@@ -228,6 +280,9 @@
             // lvInstances
             // 
             this.lvInstances.Alignment = System.Windows.Forms.ListViewAlignment.Left;
+            this.lvInstances.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colInstanceName,
+            this.colType});
             this.lvInstances.HideSelection = false;
             this.lvInstances.Location = new System.Drawing.Point(6, 49);
             this.lvInstances.Name = "lvInstances";
@@ -235,7 +290,18 @@
             this.lvInstances.Size = new System.Drawing.Size(425, 251);
             this.lvInstances.TabIndex = 6;
             this.lvInstances.UseCompatibleStateImageBehavior = false;
+            this.lvInstances.View = System.Windows.Forms.View.Details;
             this.lvInstances.SelectedIndexChanged += new System.EventHandler(this.lvInstances_SelectedIndexChanged);
+            // 
+            // colInstanceName
+            // 
+            this.colInstanceName.Text = "Instance Name";
+            this.colInstanceName.Width = 198;
+            // 
+            // colType
+            // 
+            this.colType.Text = "Type";
+            this.colType.Width = 121;
             // 
             // btnPaste
             // 
@@ -272,6 +338,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(456, 223);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -337,29 +404,45 @@
             this.btnGenerateInstanceDBs.UseVisualStyleBackColor = true;
             this.btnGenerateInstanceDBs.Click += new System.EventHandler(this.btnGenerateInstanceDBs_Click);
             // 
-            // label1
+            // tabPage3
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 84);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Instance DB Type";
+            this.tabPage3.Controls.Add(this.btnFlattenDB);
+            this.tabPage3.Controls.Add(this.btnRefreshDBFlattener);
+            this.tabPage3.Controls.Add(this.tvDBFlattener);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(308, 280);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "DB Flattener";
+            this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // cmboInstanceType
+            // btnRefreshDBFlattener
             // 
-            this.cmboInstanceType.FormattingEnabled = true;
-            this.cmboInstanceType.Items.AddRange(new object[] {
-            "$Motor",
-            "$Valve",
-            "$AnalogInput",
-            "$AnalogOutput",
-            "$DigitalInput",
-            "$DigitalOutput"});
-            this.cmboInstanceType.Location = new System.Drawing.Point(105, 81);
-            this.cmboInstanceType.Name = "cmboInstanceType";
-            this.cmboInstanceType.Size = new System.Drawing.Size(121, 21);
-            this.cmboInstanceType.TabIndex = 2;
+            this.btnRefreshDBFlattener.Location = new System.Drawing.Point(6, 6);
+            this.btnRefreshDBFlattener.Name = "btnRefreshDBFlattener";
+            this.btnRefreshDBFlattener.Size = new System.Drawing.Size(75, 23);
+            this.btnRefreshDBFlattener.TabIndex = 7;
+            this.btnRefreshDBFlattener.Text = "Refresh";
+            this.btnRefreshDBFlattener.UseVisualStyleBackColor = true;
+            this.btnRefreshDBFlattener.Click += new System.EventHandler(this.btnRefreshDBFlattener_Click);
+            // 
+            // tvDBFlattener
+            // 
+            this.tvDBFlattener.Location = new System.Drawing.Point(2, 35);
+            this.tvDBFlattener.Name = "tvDBFlattener";
+            this.tvDBFlattener.Size = new System.Drawing.Size(304, 245);
+            this.tvDBFlattener.TabIndex = 6;
+            // 
+            // btnFlattenDB
+            // 
+            this.btnFlattenDB.Location = new System.Drawing.Point(87, 6);
+            this.btnFlattenDB.Name = "btnFlattenDB";
+            this.btnFlattenDB.Size = new System.Drawing.Size(75, 23);
+            this.btnFlattenDB.TabIndex = 8;
+            this.btnFlattenDB.Text = "Flatten";
+            this.btnFlattenDB.UseVisualStyleBackColor = true;
+            this.btnFlattenDB.Click += new System.EventHandler(this.btnFlattenDB_Click);
             // 
             // Form1
             // 
@@ -374,8 +457,9 @@
             this.Controls.Add(this.grpProject);
             this.Controls.Add(this.txt_Status);
             this.Controls.Add(this.grpPortal);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "TIATool";
             this.grpPortal.ResumeLayout(false);
             this.grpPortal.PerformLayout();
             this.txt_Status.ResumeLayout(false);
@@ -387,6 +471,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -421,6 +506,14 @@
         private System.Windows.Forms.Button btnGenerateInstanceDBs;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cmboInstanceType;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtInstancePrefix;
+        private System.Windows.Forms.ColumnHeader colInstanceName;
+        private System.Windows.Forms.ColumnHeader colType;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.Button btnFlattenDB;
+        private System.Windows.Forms.Button btnRefreshDBFlattener;
+        private System.Windows.Forms.TreeView tvDBFlattener;
     }
 }
 
