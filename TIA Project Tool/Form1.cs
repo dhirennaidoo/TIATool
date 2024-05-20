@@ -146,11 +146,14 @@ namespace TIA_Project_Tool
             }
         }
 
+
+        /// <summary>
+        /// Method <c>OpenProject</c> opens either a local session or standalone project.
+        /// </summary>
         private void OpenProject(string ProjectPath)
         {
             string strExtension = Path.GetExtension(ProjectPath);
 
-            
             try
             {
                 if (strExtension == ".als17")
@@ -194,69 +197,77 @@ namespace TIA_Project_Tool
 
         private void ConnectTIA()
         {
-            btnConnectProject.Enabled = false;
-            IList<TiaPortalProcess> processes = TiaPortal.GetProcesses();
-            IList<String> ilDevices = new List<String> { };
-            switch (processes.Count)
+            try
             {
-                case 1:
-                    _tiaProcess = processes[0];
-                    MyTiaPortal = _tiaProcess.Attach();
-                    if (MyTiaPortal.GetCurrentProcess().Mode == TiaPortalMode.WithUserInterface)
-                    {
-                        chkHideInterface.Checked = false;
-                    }
-                    else
-                    {
-                        chkHideInterface.Checked = true;
-                    }
+                IList<TiaPortalProcess> processes = TiaPortal.GetProcesses();
+            
+                btnConnectProject.Enabled = false;
+                IList<String> ilDevices = new List<String> { };
+                switch (processes.Count)
+                {
+                    case 1:
+                        _tiaProcess = processes[0];
+                        MyTiaPortal = _tiaProcess.Attach();
+                        if (MyTiaPortal.GetCurrentProcess().Mode == TiaPortalMode.WithUserInterface)
+                        {
+                            chkHideInterface.Checked = false;
+                        }
+                        else
+                        {
+                            chkHideInterface.Checked = true;
+                        }
 
-                    //Project is open
-                    if (MyTiaPortal.Projects.Count > 0)
-                    {
-                        MyProject = MyTiaPortal.Projects[0];
-                        ilDevices = getDevicesFromProject();
-                    }
+                        //Project is open
+                        if (MyTiaPortal.Projects.Count > 0)
+                        {
+                            MyProject = MyTiaPortal.Projects[0];
+                            ilDevices = getDevicesFromProject();
+                        }
 
-                    //Local session is open
-                    if (MyTiaPortal.LocalSessions.Count > 0)
-                    {
-                        MyLocalSession = MyTiaPortal.LocalSessions[0];
-                        ilDevices = getDevicesFromLocalSession();
-                    }
+                        //Local session is open
+                        if (MyTiaPortal.LocalSessions.Count > 0)
+                        {
+                            MyLocalSession = MyTiaPortal.LocalSessions[0];
+                            ilDevices = getDevicesFromLocalSession();
+                        }
 
-                    //Nothing opened
-                    if ((MyTiaPortal.Projects.Count <= 0) && (MyTiaPortal.LocalSessions.Count <= 0))
-                    {
-                        ssLabel.Text = "No TIA Portal Project or Local Session was open!";
-                        btnConnectProject.Enabled = true;
-                        return;
-                    }
+                        //Nothing opened
+                        if ((MyTiaPortal.Projects.Count <= 0) && (MyTiaPortal.LocalSessions.Count <= 0))
+                        {
+                            ssLabel.Text = "No TIA Portal Project or Local Session was open!";
+                            btnConnectProject.Enabled = true;
+                            return;
+                        }
 
                     
-                    cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
+                        cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
 
-                    break;
-                case 0:
-                    ssLabel.Text = "No running instance of TIA Portal was found!";
-                    btnConnectProject.Enabled = true;
-                    return;
-                default:
-                    ssLabel.Text = "More than one running instance of TIA Portal was found!";
-                    btnConnectProject.Enabled = true;
-                    return;
+                        break;
+                    case 0:
+                        ssLabel.Text = "No running instance of TIA Portal was found!";
+                        btnConnectProject.Enabled = true;
+                        return;
+                    default:
+                        ssLabel.Text = "More than one running instance of TIA Portal was found!";
+                        btnConnectProject.Enabled = true;
+                        return;
+                }
+
+                ssLabel.Text = _tiaProcess.ProjectPath.ToString();
+                btnStartTIAPortal.Enabled = false;
+                btnConnectProject.Enabled = true;
+                btnConnectProject.Text = "Disconnect";
+                btnCloseTIAPortal.Enabled = true;
+                //btn_CompileHW.Enabled = true;
+                btnCloseProject.Enabled = true;
+                btnOpenProj.Enabled = false;
+                btnSaveProject.Enabled = true;
+                //btn_AddHW.Enabled = true;
             }
-
-            ssLabel.Text = _tiaProcess.ProjectPath.ToString();
-            btnStartTIAPortal.Enabled = false;
-            btnConnectProject.Enabled = true;
-            btnConnectProject.Text = "Disconnect";
-            btnCloseTIAPortal.Enabled = true;
-            //btn_CompileHW.Enabled = true;
-            btnCloseProject.Enabled = true;
-            btnOpenProj.Enabled = false;
-            btnSaveProject.Enabled = true;
-            //btn_AddHW.Enabled = true;
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not connect. Error:" + ex.ToString());
+            }
         }
 
         private IList<String> getDevicesFromProject()
@@ -773,6 +784,13 @@ namespace TIA_Project_Tool
             }
             PlcBlock b = pbug.Blocks.Find(strBlockName);
             return b;
+        }
+
+        private void btnRefreshDevices_Click(object sender, EventArgs e)
+        {
+            IList<String> ilDevices = new List<String> { };
+            ilDevices = getDevicesFromProject();
+            cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
         }
     }
 
