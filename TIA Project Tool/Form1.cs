@@ -1,5 +1,5 @@
 ﻿//TIA Project Tool
-//V14
+//V14,15,16,18
 
 using Microsoft.Win32;
 using System;
@@ -45,6 +45,7 @@ using Siemens.Engineering.SW.TechnologicalObjects;
 using Siemens.Engineering.SW.TechnologicalObjects.Motion;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.Upload;
+using System.Diagnostics;
 
 namespace TIA_Project_Tool
 {
@@ -74,10 +75,20 @@ namespace TIA_Project_Tool
             InitializeComponent();
             AppDomain CurrentDomain = AppDomain.CurrentDomain;
             CurrentDomain.AssemblyResolve += new ResolveEventHandler(MyResolver);
+
+            ssLabel.Text = "Loaded ";
+            bool xLoaded = false;
+            foreach (Assembly ass in CurrentDomain.GetAssemblies())
+            {
+                ssLabel.Text += ass.FullName;
+                Debug.WriteLine(ass.FullName);
+            }
         }
 
         private static Assembly MyResolver(object sender, ResolveEventArgs args)
         {
+            RegistryKey filePathReg = null;
+            string strOpennessVer = "";
             int index = args.Name.IndexOf(',');
             if (index == -1)
             {
@@ -85,19 +96,47 @@ namespace TIA_Project_Tool
             }
             string name = args.Name.Substring(0, index);
 
-            RegistryKey filePathReg = Registry.LocalMachine.OpenSubKey(
-            //    "SOFTWARE\\Siemens\\Automation\\Openness\\14.0\\PublicAPI\\14.0.1.0");
-                "SOFTWARE\\Siemens\\Automation\\Openness\\17.0\\PublicAPI\\17.0.0.0");
-            object oRegKeyValue = filePathReg?.GetValue(name);
-            if (oRegKeyValue != null)
+            //Attmept to read API registry folder
+            try
             {
-                string filePath = oRegKeyValue.ToString();
+                RegistryKey OpennessRegFolder = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Siemens\\Automation\\Openness");
 
-                string path = filePath;
-                string fullPath = Path.GetFullPath(path);
-                if (File.Exists(fullPath))
+                foreach (string keyname in OpennessRegFolder.GetSubKeyNames())
                 {
-                    return Assembly.LoadFrom(fullPath);
+                    if (keyname.Length > 0)
+                    {
+                        //TODO: Accommodate multiple installed versions. Perhaps analyse and pick highest?
+                        strOpennessVer = keyname;
+                    }
+                }
+            }
+            catch (Exception ex)
+                {MessageBox.Show("Error reading Openness registry folder. " + ex.ToString());}
+
+            //Attempt to read API file location
+            try
+            {
+                filePathReg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Siemens\\Automation\\Openness\\" + strOpennessVer + "\\PublicAPI\\" + strOpennessVer + ".0.0");
+            }
+            catch (Exception ex)
+                { MessageBox.Show("Error reading Openness file path. " + ex.ToString()); }
+
+
+            //If still null, error out
+            if (filePathReg != null)
+            {
+                object oRegKeyValue = filePathReg?.GetValue(name);
+                //object oRegKeyValue = filePathReg?.GetValue("Siemens.Engineering");
+                if (oRegKeyValue != null)
+                {
+                    string filePath = oRegKeyValue.ToString();
+
+                    string path = filePath;
+                    string fullPath = Path.GetFullPath(path);
+                    if (File.Exists(fullPath))
+                    {
+                        return Assembly.LoadFrom(fullPath);
+                    }
                 }
             }
 
@@ -156,15 +195,19 @@ namespace TIA_Project_Tool
 
             try
             {
-                if (strExtension == ".als17")
+                if (strExtension.Contains("als"))
                 {
                     MyLocalSession = MyTiaPortal.LocalSessions.Open(new FileInfo(ProjectPath));
                 }
-                else
+
+                if (strExtension.Contains("ap"))
                 {
                     MyProject = MyTiaPortal.Projects.Open(new FileInfo(ProjectPath));
+                    ssLabel.Text = "Project " + ProjectPath + " opened";
                 }
-                ssLabel.Text = "Project " + ProjectPath + " opened";
+
+                ssLabel.Text = "Project path with extension " + strExtension + " is not valid (.als[vv] or .ap[vv])";
+
             }
             catch (Exception ex)
             {
@@ -201,7 +244,6 @@ namespace TIA_Project_Tool
             {
                 IList<TiaPortalProcess> processes = TiaPortal.GetProcesses();
             
-                btnConnectProject.Enabled = false;
                 IList<String> ilDevices = new List<String> { };
                 switch (processes.Count)
                 {
@@ -258,7 +300,6 @@ namespace TIA_Project_Tool
                 btnConnectProject.Enabled = true;
                 btnConnectProject.Text = "Disconnect";
                 btnCloseTIAPortal.Enabled = true;
-                //btn_CompileHW.Enabled = true;
                 btnCloseProject.Enabled = true;
                 btnOpenProj.Enabled = false;
                 btnSaveProject.Enabled = true;
@@ -267,27 +308,45 @@ namespace TIA_Project_Tool
             catch (Exception ex)
             {
                 MessageBox.Show("Could not connect. Error:" + ex.ToString());
+                btnConnectProject.Enabled = true;
+
             }
         }
 
+        /// <summary>
+        /// This will iterate through all devices in the project or local session
+        /// and return an IList of Strings populates with all the Device.name entries
+        /// </summary>
         private IList<String> getDevicesFromProject()
         {
             IList < String > ilDevices = new List<String> ();
             //string[] strDevices = new string[] { };
             //if MyProject. error checking?
-            foreach (Device device in MyProject.Devices)
+            try
             {
-                string testc = device.Name;
-                DeviceItemComposition deviceItemAggregation = device.DeviceItems;
-                foreach (DeviceItem deviceItem in deviceItemAggregation)
+                foreach (Device device in MyProject.Devices)
                 {
-                    ilDevices.Add(deviceItem.Name);
-                
+                    string testc = device.Name;
+                    ilDevices.Add(device.Name);
+                    //device.Name appears to work...better?
+                    //DeviceItemComposition deviceItemAggregation = device.DeviceItems;
+                    //foreach (DeviceItem deviceItem in deviceItemAggregation)
+                    //{
+                    //    ilDevices.Add(deviceItem.Name);
+                    //}
                 }
+            }
+            catch (Exception ex)
+            {
+                ssLabel.Text = "Error getting devices: " + ex.Message;
             }
             return ilDevices;
         }
 
+        /// <summary>
+        /// This will iterate through all devices in the local session
+        /// and return an IList of Strings populated with all the Device.name entries
+        /// </summary>
         private IList<String> getDevicesFromLocalSession()
         {
             IList<String> ilDevices = new List<String>();
@@ -301,7 +360,6 @@ namespace TIA_Project_Tool
                 //foreach (DeviceItem deviceItem in deviceItemAggregation)
                 //{
                 //    ilDevices.Add(deviceItem.Name);
-
                 //}
             }
             return ilDevices;
@@ -372,6 +430,15 @@ namespace TIA_Project_Tool
 
         }
 
+        /// <summary>
+        /// This will 
+        /// <ol>
+        ///     <li>retrieve whatever text is in the clipboard and split by columns (if copied from Excel)</li>
+        ///     <li>iterate through all devices in the project or local session</li>
+        ///     <li>Populate the instances ListView with the pasted names and data types. </li>
+        /// </ol>
+        /// If the copied data has a type column, use that data for data type. Otherwise, data type comes from instance DB type dropdown.
+        /// </summary>
         private void btnPaste_Click(object sender, EventArgs e)
         {
             string cb = Clipboard.GetText();
@@ -428,7 +495,7 @@ namespace TIA_Project_Tool
 
         /// <summary>
         /// This will iterate through all devices in the project or local session
-        /// and return the one that matches the selected device
+        /// and return ProjectBase.Device that matches the selected device name
         /// </summary>
         private Device GetDevice()
         {
@@ -460,6 +527,9 @@ namespace TIA_Project_Tool
             return dvc;
         }
 
+        /// <summary>
+        /// This is self-explanatory. Why do we need it? MC instantiation needs a compile after every instantiation. Because Siemens.
+        /// </summary>
         private bool StartCompile()
         {
             Device dvcCpu = GetDevice();
@@ -488,6 +558,10 @@ namespace TIA_Project_Tool
 
             doc.Save(strPath);
         }
+
+        /// <summary>
+        /// Takes the selected master copy and instantiates it based on the pasted instance names.
+        /// </summary>
         private void btnGenerateInstances_Click(object sender, EventArgs e)
         {
             //Of course this damn thing has no empty constructor, FFS
@@ -563,6 +637,7 @@ namespace TIA_Project_Tool
         /// <summary>
         /// This function accepts a <c>MasterCopyFolder</c> parameter and
         /// browses it, forming a TreeNode that represents the structure.
+        /// It does use a recursive call to drill-down that seems to work, but have not tested it properly. Use at your own peril.
         /// </summary>
         /// <param name="mcsf">Master Copies folder</param>
         private TreeNode getMCFolderAsTreeNode(MasterCopyFolder mcsf)
@@ -588,6 +663,9 @@ namespace TIA_Project_Tool
             return newNode;
         }
 
+        /// <summary>
+        /// It's in the name. Checks for local session vs project, but 
+        /// </summary>
         private void btnGenerateInstanceDBs_Click(object sender, EventArgs e)
         {
             PlcSoftware plcs = null;
@@ -616,21 +694,22 @@ namespace TIA_Project_Tool
                 }
             }
 
-            //Convert ListViewItem to string list
-            List<string> strInstances = lvInstances.Items.Cast<ListViewItem>().Select(item => item.Text).ToList();
-
-            //Assume first column is the instance name, and the second column contains the type
-            foreach (ListViewItem lvi in lvInstances.Items)
+            if (plcs != null)
             {
-                //filter block names out here
-                if (lvi.Text.Length > 0)
+                //Convert ListViewItem to string list
+                List<string> strInstances = lvInstances.Items.Cast<ListViewItem>().Select(item => item.Text).ToList();
+
+                //Assume first column is the instance name, and the second column contains the type
+                foreach (ListViewItem lvi in lvInstances.Items)
                 {
-                    string strInstanceDBName = txtInstancePrefix.Text + lvi.SubItems[0].Text;
-                    plcs.BlockGroup.Blocks.CreateInstanceDB(strInstanceDBName, true, 1, lvi.SubItems[1].Text);
+                    //filter block names out here
+                    if (lvi.Text.Length > 0)
+                    {
+                        string strInstanceDBName = txtInstancePrefix.Text + lvi.SubItems[0].Text;
+                        plcs.BlockGroup.Blocks.CreateInstanceDB(strInstanceDBName, true, 1, lvi.SubItems[1].Text);
+                    }
                 }
             }
-
-
         }
 
         private void btnRetrieveMasterCopies_Click_1(object sender, EventArgs e)

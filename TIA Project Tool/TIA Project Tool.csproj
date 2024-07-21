@@ -63,13 +63,15 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Siemens.Engineering, Version=14.0.1.0, Culture=neutral, PublicKeyToken=d29ec89bac048f84, processorArchitecture=MSIL">
+    <Reference Include="Siemens.Engineering, Version=17.0.0.0, Culture=neutral, PublicKeyToken=d29ec89bac048f84, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Siemens API\Siemens.Engineering.dll</HintPath>
+      <HintPath>Siemens API\V18\Siemens.Engineering.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Siemens.Engineering.Hmi, Version=14.0.1.0, Culture=neutral, PublicKeyToken=d29ec89bac048f84, processorArchitecture=MSIL">
+    <Reference Include="Siemens.Engineering.Hmi, Version=17.0.0.0, Culture=neutral, PublicKeyToken=d29ec89bac048f84, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Siemens API\Siemens.Engineering.Hmi.dll</HintPath>
+      <HintPath>Siemens API\V18\Siemens.Engineering.Hmi.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
