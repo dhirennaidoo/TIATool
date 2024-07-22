@@ -744,7 +744,7 @@ namespace TIA_Project_Tool
             }
 
             //Process mcsf
-
+            tvMasterCopies.Nodes.Clear();
             tvMasterCopies.Nodes.Add(getMCFolderAsTreeNode(mcsf));
         }
 
