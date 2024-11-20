@@ -36,7 +36,12 @@
             this.txt_Status = new System.Windows.Forms.StatusStrip();
             this.ssLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.grpProject = new System.Windows.Forms.GroupBox();
+            this.btnCloseProject = new System.Windows.Forms.Button();
+            this.btnSaveProject = new System.Windows.Forms.Button();
+            this.btnConnectProject = new System.Windows.Forms.Button();
+            this.btnOpenProj = new System.Windows.Forms.Button();
             this.grpDeviceSelection = new System.Windows.Forms.GroupBox();
+            this.btnRefreshDevices = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.txtInstancePrefix = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -60,11 +65,7 @@
             this.btnRefreshDBFlattener = new System.Windows.Forms.Button();
             this.tvDBFlattener = new System.Windows.Forms.TreeView();
             this.btnGenerateInstanceDBs = new System.Windows.Forms.Button();
-            this.btnRefreshDevices = new System.Windows.Forms.Button();
-            this.btnCloseProject = new System.Windows.Forms.Button();
-            this.btnSaveProject = new System.Windows.Forms.Button();
-            this.btnConnectProject = new System.Windows.Forms.Button();
-            this.btnOpenProj = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
@@ -148,6 +149,63 @@
             this.grpProject.TabStop = false;
             this.grpProject.Text = "Project";
             // 
+            // btnCloseProject
+            // 
+            this.btnCloseProject.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.Close_16x;
+            this.btnCloseProject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnCloseProject.Location = new System.Drawing.Point(192, 19);
+            this.btnCloseProject.Name = "btnCloseProject";
+            this.btnCloseProject.Size = new System.Drawing.Size(56, 56);
+            this.btnCloseProject.TabIndex = 3;
+            this.btnCloseProject.Text = "Close";
+            this.btnCloseProject.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnCloseProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnCloseProject.UseVisualStyleBackColor = true;
+            this.btnCloseProject.Click += new System.EventHandler(this.btnCloseProject_Click);
+            // 
+            // btnSaveProject
+            // 
+            this.btnSaveProject.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.Save_16x;
+            this.btnSaveProject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnSaveProject.Location = new System.Drawing.Point(130, 19);
+            this.btnSaveProject.Name = "btnSaveProject";
+            this.btnSaveProject.Size = new System.Drawing.Size(56, 56);
+            this.btnSaveProject.TabIndex = 2;
+            this.btnSaveProject.Text = "Save";
+            this.btnSaveProject.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnSaveProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnSaveProject.UseVisualStyleBackColor = true;
+            this.btnSaveProject.Click += new System.EventHandler(this.btnSaveProject_Click);
+            // 
+            // btnConnectProject
+            // 
+            this.btnConnectProject.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.ConnectToRemoteServer_16x;
+            this.btnConnectProject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnConnectProject.Location = new System.Drawing.Point(68, 19);
+            this.btnConnectProject.Name = "btnConnectProject";
+            this.btnConnectProject.Size = new System.Drawing.Size(56, 56);
+            this.btnConnectProject.TabIndex = 1;
+            this.btnConnectProject.Text = "Connect";
+            this.btnConnectProject.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnConnectProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnConnectProject.UseVisualStyleBackColor = true;
+            this.btnConnectProject.Click += new System.EventHandler(this.btnConnectProject_Click);
+            // 
+            // btnOpenProj
+            // 
+            this.btnOpenProj.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.OpenFolder_16x;
+            this.btnOpenProj.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnOpenProj.Enabled = false;
+            this.btnOpenProj.Location = new System.Drawing.Point(6, 19);
+            this.btnOpenProj.Name = "btnOpenProj";
+            this.btnOpenProj.Size = new System.Drawing.Size(56, 56);
+            this.btnOpenProj.TabIndex = 0;
+            this.btnOpenProj.Text = "Open";
+            this.btnOpenProj.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnOpenProj.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnOpenProj.UseVisualStyleBackColor = true;
+            this.btnOpenProj.Click += new System.EventHandler(this.btnOpenProj_Click);
+            // 
             // grpDeviceSelection
             // 
             this.grpDeviceSelection.Controls.Add(this.btnRefreshDevices);
@@ -163,6 +221,16 @@
             this.grpDeviceSelection.TabIndex = 3;
             this.grpDeviceSelection.TabStop = false;
             this.grpDeviceSelection.Text = "Device";
+            // 
+            // btnRefreshDevices
+            // 
+            this.btnRefreshDevices.Image = global::TIA_Project_Tool.Properties.Resources.Refresh;
+            this.btnRefreshDevices.Location = new System.Drawing.Point(391, 20);
+            this.btnRefreshDevices.Name = "btnRefreshDevices";
+            this.btnRefreshDevices.Size = new System.Drawing.Size(31, 23);
+            this.btnRefreshDevices.TabIndex = 6;
+            this.btnRefreshDevices.UseVisualStyleBackColor = true;
+            this.btnRefreshDevices.Click += new System.EventHandler(this.btnRefreshDevices_Click);
             // 
             // label2
             // 
@@ -389,78 +457,22 @@
             this.btnGenerateInstanceDBs.UseVisualStyleBackColor = true;
             this.btnGenerateInstanceDBs.Click += new System.EventHandler(this.btnGenerateInstanceDBs_Click);
             // 
-            // btnRefreshDevices
+            // button1
             // 
-            this.btnRefreshDevices.Image = global::TIA_Project_Tool.Properties.Resources.Refresh;
-            this.btnRefreshDevices.Location = new System.Drawing.Point(391, 20);
-            this.btnRefreshDevices.Name = "btnRefreshDevices";
-            this.btnRefreshDevices.Size = new System.Drawing.Size(31, 23);
-            this.btnRefreshDevices.TabIndex = 6;
-            this.btnRefreshDevices.UseVisualStyleBackColor = true;
-            this.btnRefreshDevices.Click += new System.EventHandler(this.btnRefreshDevices_Click);
-            // 
-            // btnCloseProject
-            // 
-            this.btnCloseProject.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.Close_16x;
-            this.btnCloseProject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnCloseProject.Location = new System.Drawing.Point(192, 19);
-            this.btnCloseProject.Name = "btnCloseProject";
-            this.btnCloseProject.Size = new System.Drawing.Size(56, 56);
-            this.btnCloseProject.TabIndex = 3;
-            this.btnCloseProject.Text = "Close";
-            this.btnCloseProject.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnCloseProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnCloseProject.UseVisualStyleBackColor = true;
-            this.btnCloseProject.Click += new System.EventHandler(this.btnCloseProject_Click);
-            // 
-            // btnSaveProject
-            // 
-            this.btnSaveProject.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.Save_16x;
-            this.btnSaveProject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnSaveProject.Location = new System.Drawing.Point(130, 19);
-            this.btnSaveProject.Name = "btnSaveProject";
-            this.btnSaveProject.Size = new System.Drawing.Size(56, 56);
-            this.btnSaveProject.TabIndex = 2;
-            this.btnSaveProject.Text = "Save";
-            this.btnSaveProject.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnSaveProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnSaveProject.UseVisualStyleBackColor = true;
-            this.btnSaveProject.Click += new System.EventHandler(this.btnSaveProject_Click);
-            // 
-            // btnConnectProject
-            // 
-            this.btnConnectProject.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.ConnectToRemoteServer_16x;
-            this.btnConnectProject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnConnectProject.Location = new System.Drawing.Point(68, 19);
-            this.btnConnectProject.Name = "btnConnectProject";
-            this.btnConnectProject.Size = new System.Drawing.Size(56, 56);
-            this.btnConnectProject.TabIndex = 1;
-            this.btnConnectProject.Text = "Connect";
-            this.btnConnectProject.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnConnectProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnConnectProject.UseVisualStyleBackColor = true;
-            this.btnConnectProject.Click += new System.EventHandler(this.btnConnectProject_Click);
-            // 
-            // btnOpenProj
-            // 
-            this.btnOpenProj.BackgroundImage = global::TIA_Project_Tool.Properties.Resources.OpenFolder_16x;
-            this.btnOpenProj.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnOpenProj.Enabled = false;
-            this.btnOpenProj.Location = new System.Drawing.Point(6, 19);
-            this.btnOpenProj.Name = "btnOpenProj";
-            this.btnOpenProj.Size = new System.Drawing.Size(56, 56);
-            this.btnOpenProj.TabIndex = 0;
-            this.btnOpenProj.Text = "Open";
-            this.btnOpenProj.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnOpenProj.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnOpenProj.UseVisualStyleBackColor = true;
-            this.btnOpenProj.Click += new System.EventHandler(this.btnOpenProj_Click);
+            this.button1.Location = new System.Drawing.Point(552, 90);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 640);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnGenerateInstanceDBs);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.grpInstances);
@@ -527,6 +539,7 @@
         private System.Windows.Forms.Button btnRefreshDBFlattener;
         private System.Windows.Forms.TreeView tvDBFlattener;
         private System.Windows.Forms.Button btnRefreshDevices;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TIA Project Tool.exe" size="43448">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TIA Project Tool.exe" size="45496">
       <assemblyIdentity name="TIA Project Tool" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RG6fgLd02NMXz9WdbK3BmUlFSzrc8Wtr5cbYMB9QJ+Y=</dsig:DigestValue>
+        <dsig:DigestValue>BckJ2EHIb3mxywsJMUIOhPs00zai7jU4D3Yo5pcRgJQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
