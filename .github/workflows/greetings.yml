@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: "Thanks for logging an issue. For feature requests, please make sure you classify the issue as a bug or feature request. Like automatically selecting the only CPU. That would be a cool feature..."
+        pr-message: "Thanks a bunch for your PR!"
