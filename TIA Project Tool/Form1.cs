@@ -46,6 +46,7 @@ using Siemens.Engineering.SW.TechnologicalObjects.Motion;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.Upload;
 using System.Diagnostics;
+using System.Security.Policy;
 
 namespace TIA_Project_Tool
 {
@@ -527,6 +528,66 @@ namespace TIA_Project_Tool
 
         /// <summary>
         /// This will iterate through all devices in the project or local session
+        /// and return list of part numbers
+        /// </summary>
+        private IList<string> GetPartNumbers()
+        {
+            IList<string> ilPartNumbers = new List<string>();
+            DeviceComposition devices = null;
+            DeviceComposition ungroupedDevices = null;
+            DeviceUserGroupComposition userGroups = null;
+
+            string colSeparator = ",";
+
+            if (MyProject != null)
+            {
+                devices = MyProject.Devices;
+                ungroupedDevices = MyProject.UngroupedDevicesGroup.Devices;
+                userGroups = MyProject.DeviceGroups;
+            }
+            ;
+
+            if (MyLocalSession != null)
+            {
+                devices = MyLocalSession.Project.Devices;
+                ungroupedDevices = MyLocalSession.Project.UngroupedDevicesGroup.Devices;
+                userGroups = MyLocalSession.Project.DeviceGroups;
+            }
+
+            //Devices in root
+            foreach (Device plc in devices)
+            {
+                foreach (DeviceItem di in plc.DeviceItems)
+                {
+                    ilPartNumbers.Add(di.Name + colSeparator + di.TypeIdentifier.ToString());
+                }
+            }
+
+            //Devices in ungrouped folder
+            foreach (Device plc in ungroupedDevices)
+            {
+                foreach (DeviceItem di in plc.DeviceItems)
+                {
+                    ilPartNumbers.Add(di.Name + colSeparator + di.TypeIdentifier.ToString());
+                }
+            }
+
+            //Devices in folders
+            foreach (DeviceUserGroup dug in userGroups)
+            {
+                foreach (Device plc in dug.Devices)
+                {
+                    foreach (DeviceItem di in plc.DeviceItems)
+                    {
+                        ilPartNumbers.Add(di.Name + colSeparator + di.TypeIdentifier.ToString());
+                    }
+                }
+            }
+            return ilPartNumbers;
+        }
+
+        /// <summary>
+        /// This will iterate through all devices in the project or local session
         /// and return ProjectBase.Device that matches the selected device name
         /// </summary>
         private Device GetDevice()
@@ -751,27 +812,31 @@ namespace TIA_Project_Tool
 
             if (MyProject != null)
             {
-                foreach (Device plc in MyProject.Devices)
-                {
-                    if (plc.Name == cmboDevices.SelectedItem.ToString())
-                    {
-                        plcs = GetPlcSoftware(plc);
-                        break;
-                    }
-                }
+                //if (cmboDevices.SelectedItem == null)
+                //    { MessageBox.Show("Select a PLC first. "); }
+                //else
+
+                //    foreach (Device plc in MyProject.Devices)
+                //    {
+                //        if (plc.Name == cmboDevices.SelectedItem.ToString())
+                //        {
+                //            plcs = GetPlcSoftware(plc);
+                //            break;
+                //        }
+                //    }
                 mcsf = MyProject.ProjectLibrary.MasterCopyFolder;
             }
 
             if (MyLocalSession != null)
             {
-                foreach (Device plc in MyLocalSession.Project.Devices)
-                {
-                    if (plc.Name == cmboDevices.SelectedItem.ToString())
-                    {
-                        plcs = GetPlcSoftware(plc);
-                        break;
-                    }
-                }
+                //foreach (Device plc in MyLocalSession.Project.Devices)
+                //{
+                //    if (plc.Name == cmboDevices.SelectedItem.ToString())
+                //    {
+                //        plcs = GetPlcSoftware(plc);
+                //        break;
+                //    }
+                //}
                 mcsf = MyLocalSession.Project.ProjectLibrary.MasterCopyFolder;
             }
 
@@ -906,11 +971,22 @@ namespace TIA_Project_Tool
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
-            IList<TiaPortalProcess> processes = TiaPortal.GetProcesses();
-            frmProcessSelection popup = new frmProcessSelection(processes);
+            IList<string> partNumbers = null;
+
+            partNumbers = GetPartNumbers();
+
+            frmListExport popup = new frmListExport(partNumbers);
             popup.ShowDialog();
-            ssLabel.Text = popup.strSelectedProcId;
+        }
+
+        private void btnExportOrderNos_Click(object sender, EventArgs e)
+        {
+            IList<string> partNumbers = null;
+
+            partNumbers = GetPartNumbers();
+
+            frmListExport popup = new frmListExport(partNumbers);
+            popup.ShowDialog();
         }
     }
 

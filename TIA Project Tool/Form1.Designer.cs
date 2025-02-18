@@ -66,6 +66,8 @@
             this.tvDBFlattener = new System.Windows.Forms.TreeView();
             this.btnGenerateInstanceDBs = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnExportOrderNos = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
@@ -75,6 +77,7 @@
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpPortal
@@ -459,7 +462,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(552, 90);
+            this.button1.Location = new System.Drawing.Point(476, 175);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 11;
@@ -467,11 +470,32 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // btnExportOrderNos
+            // 
+            this.btnExportOrderNos.Location = new System.Drawing.Point(7, 18);
+            this.btnExportOrderNos.Name = "btnExportOrderNos";
+            this.btnExportOrderNos.Size = new System.Drawing.Size(56, 56);
+            this.btnExportOrderNos.TabIndex = 12;
+            this.btnExportOrderNos.Text = "Get Order No\'s";
+            this.btnExportOrderNos.UseVisualStyleBackColor = true;
+            this.btnExportOrderNos.Click += new System.EventHandler(this.btnExportOrderNos_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.btnExportOrderNos);
+            this.groupBox2.Location = new System.Drawing.Point(456, 13);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 100);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Export";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 640);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnGenerateInstanceDBs);
             this.Controls.Add(this.tabControl1);
@@ -496,6 +520,7 @@
             this.tabPage1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -540,6 +565,8 @@
         private System.Windows.Forms.TreeView tvDBFlattener;
         private System.Windows.Forms.Button btnRefreshDevices;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnExportOrderNos;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
 

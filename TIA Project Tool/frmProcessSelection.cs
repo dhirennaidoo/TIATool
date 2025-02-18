@@ -43,5 +43,10 @@ namespace TIA_Project_Tool
             strSelectedProcId = "";
             this.Close();  
         }
+
+        private void lbProcesses_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

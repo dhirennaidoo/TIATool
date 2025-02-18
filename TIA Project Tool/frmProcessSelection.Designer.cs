@@ -40,6 +40,7 @@
             this.lbProcesses.Name = "lbProcesses";
             this.lbProcesses.Size = new System.Drawing.Size(640, 316);
             this.lbProcesses.TabIndex = 0;
+            this.lbProcesses.SelectedIndexChanged += new System.EventHandler(this.lbProcesses_SelectedIndexChanged);
             // 
             // btnOK
             // 
