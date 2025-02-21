@@ -18,8 +18,8 @@ namespace TIA_Project_Tool
             InitializeComponent();
 
             lbItems.Items.Clear();
-
-            lbItems.Items.AddRange(listItems.ToArray());
+            if (listItems != null)
+            { lbItems.Items.AddRange(listItems.ToArray()); }
         }
 
         private void frmListExport_Load(object sender, EventArgs e)

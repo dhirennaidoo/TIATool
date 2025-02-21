@@ -47,6 +47,7 @@ using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.Upload;
 using System.Diagnostics;
 using System.Security.Policy;
+using System.Globalization;
 
 namespace TIA_Project_Tool
 {
@@ -66,6 +67,11 @@ namespace TIA_Project_Tool
         }
 
         public LocalSession MyLocalSession
+        {
+            get; set;
+        }
+
+        public static int intBaseVersion
         {
             get; set;
         }
@@ -90,6 +96,8 @@ namespace TIA_Project_Tool
         {
             RegistryKey filePathReg = null;
             string strOpennessVer = "";
+            string strOpennessBaseVer = "";
+
             int index = args.Name.IndexOf(',');
             if (index == -1)
             {
@@ -107,9 +115,20 @@ namespace TIA_Project_Tool
                     if (keyname.Length > 0)
                     {
                         //TODO: Accommodate multiple installed versions. Perhaps analyse and pick highest?
-                        strOpennessVer = keyname;
+                        strOpennessBaseVer = keyname;
+                        RegistryKey OpennessVersions = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Siemens\\Automation\\Openness\\" + strOpennessBaseVer + "\\PublicAPI");
+                        foreach (string version in OpennessVersions.GetSubKeyNames())
+                        {
+                            if (version.Length > 0)
+                            {
+                                strOpennessVer = version;
+                                //break;
+                            }
+                        }
                     }
                 }
+                Decimal d = Convert.ToDecimal(strOpennessBaseVer,new CultureInfo("en-US")); //FFS, this is why I like Python
+                intBaseVersion = Convert.ToInt32(d);
             }
             catch (Exception ex)
                 {MessageBox.Show("Error reading Openness registry folder. " + ex.ToString());}
@@ -117,7 +136,7 @@ namespace TIA_Project_Tool
             //Attempt to read API file location
             try
             {
-                filePathReg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Siemens\\Automation\\Openness\\" + strOpennessVer + "\\PublicAPI\\" + strOpennessVer + ".0.0");
+                filePathReg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Siemens\\Automation\\Openness\\" + strOpennessBaseVer + "\\PublicAPI\\" + strOpennessVer);
             }
             catch (Exception ex)
                 { MessageBox.Show("Error reading Openness file path. " + ex.ToString()); }
@@ -138,6 +157,11 @@ namespace TIA_Project_Tool
                     {
                         return Assembly.LoadFrom(fullPath);
                     }
+                }
+                else
+                {
+                    string strMessage = "Error loading " + name + ". Base version:" + strOpennessBaseVer + " Full version:" + strOpennessVer;
+                    MessageBox.Show(strMessage, "Error loading API", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -214,12 +238,6 @@ namespace TIA_Project_Tool
             {
                 ssLabel.Text = "Error while opening project: " + ex.Message;
             }
-
-            //btn_CompileHW.Enabled = true;
-            //btn_CloseProject.Enabled = true;
-            //btn_SearchProject.Enabled = false;
-            //btn_Save.Enabled = true;
-            //btn_AddHW.Enabled = true;
         }
 
         private void SaveProject()
@@ -239,10 +257,129 @@ namespace TIA_Project_Tool
             //btn_CompileHW.Enabled = false;
         }
 
+        private void setConnected()
+        {
+            btnStartTIAPortal.Enabled = false;
+            btnConnectProject.Enabled = true;
+            btnConnectProject.Text = "Disconnect";
+            btnCloseTIAPortal.Enabled = true;
+            btnCloseProject.Enabled = true;
+            btnOpenProj.Enabled = false;
+            btnSaveProject.Enabled = true;
+            btnExportOrderNos.Enabled = true;
+        }
+
+        private void setDisconnected()
+        {
+            btnStartTIAPortal.Enabled = false;
+            btnConnectProject.Enabled = true;
+            btnConnectProject.Text = "Connect";
+            btnCloseTIAPortal.Enabled = false;
+            btnCloseProject.Enabled = false;
+            btnOpenProj.Enabled = false;
+            btnSaveProject.Enabled = false;
+            btnExportOrderNos.Enabled = false;
+        }
+
+
+        private void ConnectOldTIA()
+        {
+            try
+            {
+                lblVersion.Text = Form1.intBaseVersion.ToString();
+                IList<TiaPortalProcess> processes = TiaPortal.GetProcesses();
+
+                IList<String> ilDevices = new List<String> { };
+                Boolean xProcessFound = false;
+
+                switch (processes.Count)
+                {
+                    case 1:
+                        _tiaProcess = processes[0];
+                        MyTiaPortal = _tiaProcess.Attach();
+                        xProcessFound = true;
+
+                        break;
+
+                    case 0:
+                        ssLabel.Text = "No running instance of TIA Portal was found!";
+                        btnConnectProject.Enabled = true;
+
+                        return;
+
+                    default:
+                        ssLabel.Text = "More than one running instance of TIA Portal was found.";
+
+                        frmProcessSelection popup = new frmProcessSelection(processes);
+                        popup.ShowDialog();
+                        ssLabel.Text = popup.strSelectedProcId;
+                        Console.WriteLine(popup.strSelectedProcId);
+
+                        //Attach to selected process by ID
+                        foreach (TiaPortalProcess proc in processes)
+                        {
+                            if (proc.Id.ToString() == popup.strSelectedProcId)
+                            {
+                                _tiaProcess = proc;
+                                MyTiaPortal = _tiaProcess.Attach();
+                                xProcessFound = true;
+                            }
+                        }
+
+                        break;
+                }
+
+                if (xProcessFound)
+                {
+                    btnConnectProject.Enabled = false;
+                    if (MyTiaPortal.GetCurrentProcess().Mode == TiaPortalMode.WithUserInterface)
+                    {
+                        chkHideInterface.Checked = false;
+                    }
+                    else
+                    {
+                        chkHideInterface.Checked = true;
+                    }
+
+                    //Project is open
+                    if (MyTiaPortal.Projects.Count > 0)
+                    {
+                        MyProject = MyTiaPortal.Projects[0];
+                        ilDevices = getDevicesFromProject();
+                    }
+
+                    //Nothing opened
+                    if ((MyTiaPortal.Projects.Count <= 0))
+                    {
+                        ssLabel.Text = "No TIA Portal Project was open!";
+                        btnConnectProject.Enabled = true;
+                        return;
+                    }
+
+                    cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
+                }
+                else
+                {
+                    btnConnectProject.Enabled = true;
+                    return;
+                }
+
+                ssLabel.Text = _tiaProcess.ProjectPath.ToString();
+
+                setConnected();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not connect. Error:" + ex.ToString());
+                btnConnectProject.Enabled = true;
+
+            }
+        }
         private void ConnectTIA()
         {
             try
             {
+                lblVersion.Text = Form1.intBaseVersion.ToString();
                 IList<TiaPortalProcess> processes = TiaPortal.GetProcesses();
             
                 IList<String> ilDevices = new List<String> { };
@@ -312,13 +449,20 @@ namespace TIA_Project_Tool
                     }
 
                     //Nothing opened
-                    if ((MyTiaPortal.Projects.Count <= 0) && (MyTiaPortal.LocalSessions.Count <= 0))
+                    if ((MyTiaPortal.Projects.Count <= 0))
                     {
-                        ssLabel.Text = "No TIA Portal Project or Local Session was open!";
+                        ssLabel.Text = "No TIA Portal Project was open!";
                         btnConnectProject.Enabled = true;
                         return;
                     }
 
+                    //Nothing opened
+                    if ((MyTiaPortal.LocalSessions.Count <= 0))
+                    {
+                        ssLabel.Text = "No TIA Portal Local Session was open!";
+                        btnConnectProject.Enabled = true;
+                        return;
+                    }
 
                     cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
                 }
@@ -329,14 +473,7 @@ namespace TIA_Project_Tool
                 }
 
                 ssLabel.Text = _tiaProcess.ProjectPath.ToString();
-                btnStartTIAPortal.Enabled = false;
-                btnConnectProject.Enabled = true;
-                btnConnectProject.Text = "Disconnect";
-                btnCloseTIAPortal.Enabled = true;
-                btnCloseProject.Enabled = true;
-                btnOpenProj.Enabled = false;
-                btnSaveProject.Enabled = true;
-                //btn_AddHW.Enabled = true;
+                setConnected();
             }
             catch (Exception ex)
             {
@@ -361,12 +498,6 @@ namespace TIA_Project_Tool
                 {
                     string testc = device.Name;
                     ilDevices.Add(device.Name);
-                    //device.Name appears to work...better?
-                    //DeviceItemComposition deviceItemAggregation = device.DeviceItems;
-                    //foreach (DeviceItem deviceItem in deviceItemAggregation)
-                    //{
-                    //    ilDevices.Add(deviceItem.Name);
-                    //}
                 }
             }
             catch (Exception ex)
@@ -430,7 +561,7 @@ namespace TIA_Project_Tool
 
         private void btnConnectProject_Click(object sender, EventArgs e)
         {
-            ConnectTIA();
+            ConnectOldTIA();
         }
 
         private void btnOpenProj_Click(object sender, EventArgs e)
@@ -528,7 +659,12 @@ namespace TIA_Project_Tool
 
         /// <summary>
         /// This will iterate through all devices in the project or local session
-        /// and return list of part numbers
+        /// and return list of part numbers in 
+        /// - The root
+        /// - The ungrouped folder
+        /// - User-created folders
+        /// 
+        /// Did I miss anything?
         /// </summary>
         private IList<string> GetPartNumbers()
         {
@@ -539,7 +675,13 @@ namespace TIA_Project_Tool
 
             string colSeparator = ",";
 
-            if (MyProject != null)
+            if ((MyProject == null) & (MyLocalSession == null))
+            { 
+                MessageBox.Show("Connect to TIAPortal and open a project first.");
+                return null;
+            }
+
+                if (MyProject != null)
             {
                 devices = MyProject.Devices;
                 ungroupedDevices = MyProject.UngroupedDevicesGroup.Devices;
@@ -547,12 +689,12 @@ namespace TIA_Project_Tool
             }
             ;
 
-            if (MyLocalSession != null)
-            {
-                devices = MyLocalSession.Project.Devices;
-                ungroupedDevices = MyLocalSession.Project.UngroupedDevicesGroup.Devices;
-                userGroups = MyLocalSession.Project.DeviceGroups;
-            }
+            //if (MyLocalSession != null)
+            //{
+            //    devices = MyLocalSession.Project.Devices;
+            //    ungroupedDevices = MyLocalSession.Project.UngroupedDevicesGroup.Devices;
+            //    userGroups = MyLocalSession.Project.DeviceGroups;
+            //}
 
             //Devices in root
             foreach (Device plc in devices)
@@ -985,8 +1127,13 @@ namespace TIA_Project_Tool
 
             partNumbers = GetPartNumbers();
 
-            frmListExport popup = new frmListExport(partNumbers);
-            popup.ShowDialog();
+            if (partNumbers != null)
+            {
+                frmListExport popup = new frmListExport(partNumbers);
+                popup.ShowDialog();
+            }
+            else
+            { ssLabel.Text = "Connect to TIA and open a project first!"; }
         }
     }
 

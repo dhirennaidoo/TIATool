@@ -68,6 +68,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.btnExportOrderNos = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblVersion = new System.Windows.Forms.ToolStripStatusLabel();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
@@ -126,7 +127,8 @@
             // txt_Status
             // 
             this.txt_Status.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ssLabel});
+            this.ssLabel,
+            this.lblVersion});
             this.txt_Status.Location = new System.Drawing.Point(0, 618);
             this.txt_Status.Name = "txt_Status";
             this.txt_Status.Size = new System.Drawing.Size(784, 22);
@@ -490,6 +492,12 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Export";
             // 
+            // lblVersion
+            // 
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(53, 17);
+            this.lblVersion.Text = "[Version]";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -567,6 +575,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button btnExportOrderNos;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.ToolStripStatusLabel lblVersion;
     }
 }
 
