@@ -66,7 +66,6 @@
             this.btnRefreshDBFlattener = new System.Windows.Forms.Button();
             this.tvDBFlattener = new System.Windows.Forms.TreeView();
             this.btnGenerateInstanceDBs = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.btnExportOrderNos = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.grpPortal.SuspendLayout();
@@ -468,16 +467,6 @@
             this.btnGenerateInstanceDBs.UseVisualStyleBackColor = true;
             this.btnGenerateInstanceDBs.Click += new System.EventHandler(this.btnGenerateInstanceDBs_Click);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(476, 175);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // btnExportOrderNos
             // 
             this.btnExportOrderNos.Location = new System.Drawing.Point(7, 18);
@@ -491,9 +480,9 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.btnExportOrderNos);
-            this.groupBox2.Location = new System.Drawing.Point(456, 13);
+            this.groupBox2.Location = new System.Drawing.Point(456, 12);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(200, 100);
+            this.groupBox2.Size = new System.Drawing.Size(200, 84);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Export";
@@ -504,7 +493,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 640);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnGenerateInstanceDBs);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.grpInstances);
@@ -573,7 +561,6 @@
         private System.Windows.Forms.Button btnRefreshDBFlattener;
         private System.Windows.Forms.TreeView tvDBFlattener;
         private System.Windows.Forms.Button btnRefreshDevices;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button btnExportOrderNos;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripStatusLabel lblVersion;

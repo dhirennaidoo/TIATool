@@ -485,6 +485,28 @@ namespace TIA_Project_Tool
             }
         }
 
+        private void DisconnectTIA()
+        {
+            MyTiaPortal.Dispose();
+            setDisconnected();
+        }
+
+        private int GetProjectType()
+        {
+            //Project is open
+            if (MyTiaPortal.Projects.Count > 0)
+            {
+                return 1;
+            }
+
+            //Local session is open
+            if (MyTiaPortal.LocalSessions.Count > 0)
+            {
+                return 2;
+            }
+
+            return 0;
+        }
         /// <summary>
         /// This will iterate through all devices in the project or local session
         /// and return an IList of Strings populates with all the Device.name entries
@@ -563,7 +585,11 @@ namespace TIA_Project_Tool
 
         private void btnConnectProject_Click(object sender, EventArgs e)
         {
-            ConnectTIA();
+            if (btnConnectProject.Text == "Disconnect")
+            { DisconnectTIA(); }
+            else
+            { ConnectTIA(); }
+                
         }
 
         private void btnOpenProj_Click(object sender, EventArgs e)
@@ -1109,8 +1135,21 @@ namespace TIA_Project_Tool
         private void btnRefreshDevices_Click(object sender, EventArgs e)
         {
             IList<String> ilDevices = new List<String> { };
-            ilDevices = getDevicesFromProject();
-            cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
+
+            int intProjType = GetProjectType();
+
+            if (intProjType == 1)
+            { ilDevices = getDevicesFromProject(); }
+
+            if (intProjType == 2)
+            { ilDevices = getDevicesFromLocalSession(); }
+
+            if (intProjType > 0)
+            {
+                cmboDevices.Items.Clear();
+                cmboDevices.Items.AddRange(ilDevices.ToArray<String>()); 
+            }
+                
         }
 
         private void button1_Click(object sender, EventArgs e)
