@@ -105,10 +105,17 @@ namespace TIA_Project_Tool
             }
             string name = args.Name.Substring(0, index);
 
-            //Attmept to read API registry folder
+            //Attempt to read API registry folder
             try
             {
                 RegistryKey OpennessRegFolder = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Siemens\\Automation\\Openness");
+
+                if (OpennessRegFolder == null)
+                {
+                    MessageBox.Show("TIA Openness API not found");
+
+                    return null;
+                }
 
                 foreach (string keyname in OpennessRegFolder.GetSubKeyNames())
                 {
@@ -122,7 +129,7 @@ namespace TIA_Project_Tool
                             if (version.Length > 0)
                             {
                                 strOpennessVer = version;
-                                //break;
+                                //break; For multiple versions, this will repeat until landing on the latest
                             }
                         }
                     }
@@ -161,7 +168,8 @@ namespace TIA_Project_Tool
                 else
                 {
                     string strMessage = "Error loading " + name + ". Base version:" + strOpennessBaseVer + " Full version:" + strOpennessVer;
-                    MessageBox.Show(strMessage, "Error loading API", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show(strMessage, "Error loading API", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    
                 }
             }
 
@@ -388,6 +396,7 @@ namespace TIA_Project_Tool
                 switch (processes.Count)
                 {
                     case 1:
+                        ssLabel.Text = "Found 1 process. Attaching...";
                         _tiaProcess = processes[0];
                         MyTiaPortal = _tiaProcess.Attach();
                         xProcessFound = true;
@@ -449,17 +458,9 @@ namespace TIA_Project_Tool
                     }
 
                     //Nothing opened
-                    if ((MyTiaPortal.Projects.Count <= 0))
+                    if ((MyTiaPortal.Projects.Count <= 0) && (MyTiaPortal.LocalSessions.Count <= 0))
                     {
-                        ssLabel.Text = "No TIA Portal Project was open!";
-                        btnConnectProject.Enabled = true;
-                        return;
-                    }
-
-                    //Nothing opened
-                    if ((MyTiaPortal.LocalSessions.Count <= 0))
-                    {
-                        ssLabel.Text = "No TIA Portal Local Session was open!";
+                        ssLabel.Text = "No TIA Portal Project or local session was open!";
                         btnConnectProject.Enabled = true;
                         return;
                     }
@@ -467,7 +468,8 @@ namespace TIA_Project_Tool
                     cmboDevices.Items.AddRange(ilDevices.ToArray<String>());
                 }
                 else
-                { 
+                {
+                    ssLabel.Text = "No TIA Portal process found.";
                     btnConnectProject.Enabled = true;
                     return;
                 }
@@ -561,7 +563,7 @@ namespace TIA_Project_Tool
 
         private void btnConnectProject_Click(object sender, EventArgs e)
         {
-            ConnectOldTIA();
+            ConnectTIA();
         }
 
         private void btnOpenProj_Click(object sender, EventArgs e)
@@ -681,7 +683,7 @@ namespace TIA_Project_Tool
                 return null;
             }
 
-                if (MyProject != null)
+            if (MyProject != null)
             {
                 devices = MyProject.Devices;
                 ungroupedDevices = MyProject.UngroupedDevicesGroup.Devices;
@@ -689,12 +691,12 @@ namespace TIA_Project_Tool
             }
             ;
 
-            //if (MyLocalSession != null)
-            //{
-            //    devices = MyLocalSession.Project.Devices;
-            //    ungroupedDevices = MyLocalSession.Project.UngroupedDevicesGroup.Devices;
-            //    userGroups = MyLocalSession.Project.DeviceGroups;
-            //}
+            if (MyLocalSession != null)
+            {
+                devices = MyLocalSession.Project.Devices;
+                ungroupedDevices = MyLocalSession.Project.UngroupedDevicesGroup.Devices;
+                userGroups = MyLocalSession.Project.DeviceGroups;
+            }
 
             //Devices in root
             foreach (Device plc in devices)
@@ -1134,6 +1136,11 @@ namespace TIA_Project_Tool
             }
             else
             { ssLabel.Text = "Connect to TIA and open a project first!"; }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            ssLabel.Text = "Form loaded";
         }
     }
 

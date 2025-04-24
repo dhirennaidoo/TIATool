@@ -35,6 +35,7 @@
             this.chkHideInterface = new System.Windows.Forms.CheckBox();
             this.txt_Status = new System.Windows.Forms.StatusStrip();
             this.ssLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblVersion = new System.Windows.Forms.ToolStripStatusLabel();
             this.grpProject = new System.Windows.Forms.GroupBox();
             this.btnCloseProject = new System.Windows.Forms.Button();
             this.btnSaveProject = new System.Windows.Forms.Button();
@@ -68,7 +69,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.btnExportOrderNos = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.lblVersion = new System.Windows.Forms.ToolStripStatusLabel();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
@@ -140,6 +140,12 @@
             this.ssLabel.Name = "ssLabel";
             this.ssLabel.Size = new System.Drawing.Size(118, 17);
             this.ssLabel.Text = "toolStripStatusLabel1";
+            // 
+            // lblVersion
+            // 
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(53, 17);
+            this.lblVersion.Text = "[Version]";
             // 
             // grpProject
             // 
@@ -492,12 +498,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Export";
             // 
-            // lblVersion
-            // 
-            this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(53, 17);
-            this.lblVersion.Text = "[Version]";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -516,6 +516,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "TIATool";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.grpPortal.ResumeLayout(false);
             this.grpPortal.PerformLayout();
             this.txt_Status.ResumeLayout(false);
