@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Xml.Linq;
+using System.Text.Json;
 
 //Siemens includes
 using Siemens.Engineering.Multiuser;
@@ -48,6 +49,8 @@ using Siemens.Engineering.Upload;
 using System.Diagnostics;
 using System.Security.Policy;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Xml;
 
 namespace TIA_Project_Tool
 {
@@ -1051,6 +1054,7 @@ namespace TIA_Project_Tool
             {
                 rootNode.Nodes.Add(getProgamBlocksFolderAsTreeNode(blockUserGroup));
             }
+            tvDBFlattener.Nodes.Clear();
             tvDBFlattener.Nodes.Add(rootNode);
         }
 
@@ -1077,6 +1081,83 @@ namespace TIA_Project_Tool
             return newNode;
         }
 
+        private static object ParseMember(XElement member, XNamespace ns)
+        {
+            return new
+            {
+                Name = (string)member.Attribute("Name"),
+                Datatype = (string)member.Attribute("Datatype"),
+                Remanence = (string)member.Attribute("Remanence"),
+                Accessibility = (string)member.Attribute("Accessibility"),
+
+                Attributes = member
+                    .Element(ns + "AttributeList")?
+                    .Elements()
+                    .ToDictionary(
+                        a => (string)a.Attribute("Name"),
+                        a => a.Value
+                    ),
+
+                // Recursively get child members (for Structs)
+                Children = member
+                    .Elements(ns + "Member")
+                    .Select(m => ParseMember(m, ns))
+                    .ToList()
+            };
+        }
+
+        /// <summary>
+        /// Converts XML exported block to CSV
+        /// </summary>
+        public static void ConvertInterfaceToJson(string xmlPath)
+        {
+            string jsonPath = Path.ChangeExtension(xmlPath, ".json");
+            // Load XML
+            XDocument doc = XDocument.Load(xmlPath);
+
+            // Find Interface node
+            XElement interfaceNode = doc.Descendants("Interface").FirstOrDefault();
+
+            if (interfaceNode == null)
+                throw new Exception("Interface node not found.");
+
+            // Siemens namespace
+            XNamespace ns =
+                "http://www.siemens.com/automation/Openness/SW/Interface/v5";
+
+            // Get Sections node
+            XElement sectionsNode = interfaceNode.Element(ns + "Sections");
+
+            if (sectionsNode == null)
+                throw new Exception("Sections node not found.");
+
+            // Build JSON object
+            var interfaceData = new
+            {
+                Sections = sectionsNode.Elements(ns + "Section")
+                    .Select(section => new
+                    {
+                        Name = (string)section.Attribute("Name"),
+
+                        Members = section.Elements(ns + "Member")
+                            .Select(m => ParseMember(m, ns))
+                            .ToList()
+                    })
+                    .ToList()
+            };
+
+            // Serialize JSON
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            string json =
+                JsonSerializer.Serialize(interfaceData, options);
+
+            // Save file
+            File.WriteAllText(jsonPath, json);
+        }
         private void btnFlattenDB_Click(object sender, EventArgs e)
         {
             PlcSoftware plcs = null;
@@ -1110,7 +1191,9 @@ namespace TIA_Project_Tool
 
             string strExportPath = @"C:\TIATool\export.xml";
             ExportOptions eo = new ExportOptions();
-            db.Export(new FileInfo(strExportPath), ExportOptions.None);
+            db.Export(new FileInfo(strExportPath), ExportOptions.WithDefaults | ExportOptions.WithReadOnly);
+
+            ConvertInterfaceToJson(strExportPath);
 
         }
 
