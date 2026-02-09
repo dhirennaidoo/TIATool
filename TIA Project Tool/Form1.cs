@@ -1107,7 +1107,7 @@ namespace TIA_Project_Tool
         }
 
         /// <summary>
-        /// Converts XML exported block to CSV
+        /// Converts XML exported block to JSON
         /// </summary>
         public static void ConvertInterfaceToJson(string xmlPath)
         {
