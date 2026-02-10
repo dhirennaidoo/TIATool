@@ -1081,6 +1081,84 @@ namespace TIA_Project_Tool
             return newNode;
         }
 
+        public class FlatTag
+        {
+            public string Path { get; set; }
+            public string Datatype { get; set; }
+
+            public Dictionary<string, string> Attributes { get; set; }
+
+            /// <summary>
+            /// Returns a single string with the flattened tag path (traversing structs, etc)
+            /// HOWEVER...UDT offsets appear to start at zero again. God knows why. \
+            /// I can't even begin to start thinking about calculating the absolute offset by keeping track of the nesting depth. FFS.
+            /// </summary>
+            public string GetCSVString()
+            {
+                string strCSV = this.Path + "," + this.Datatype;
+                
+                if (this.Attributes != null)
+                {
+                    if (this.Attributes.ContainsKey("Offset"))
+                    {
+                        strCSV += "," + this.Attributes["Offset"];
+
+                        int intOffset = int.Parse(this.Attributes["Offset"]);
+
+                        //Offset is total bits...so divide by 8 and get remainder for bit offset
+                        int intByteOffset = intOffset / 8;
+                        int intBitOffset = intOffset % 8;
+
+                        strCSV += "," + intByteOffset.ToString() + "." + intBitOffset.ToString();
+
+                    }
+                }
+                return strCSV;
+            }
+        }
+
+        private static void FlattenMembers(dynamic member,string parentPath,List<FlatTag> result)
+        {
+            string currentPath = string.IsNullOrEmpty(parentPath)
+                ? member.Name
+                : parentPath + "." + member.Name;
+
+            // If this is a leaf node, add it
+            if (member.Children == null || member.Children.Count == 0)
+            {
+                result.Add(new FlatTag
+                {
+                    Path = currentPath,
+                    Datatype = member.Datatype,
+                    Attributes = member.Attributes
+                });
+
+                return;
+            }
+
+            // Otherwise recurse
+            foreach (var child in member.Children)
+            {
+                FlattenMembers(child, currentPath, result);
+            }
+        }
+
+        public static List<FlatTag> GetFlatTags(dynamic interfaceData)
+        {
+            var result = new List<FlatTag>();
+
+            foreach (var section in interfaceData.Sections)
+            {
+                foreach (var member in section.Members)
+                {
+                    FlattenMembers(member, "", result);
+                }
+            }
+
+            return result;
+        }
+
+
         private static object ParseMember(XElement member, XNamespace ns)
         {
             // Normal child members (Struct case)
@@ -1173,6 +1251,61 @@ namespace TIA_Project_Tool
             // Save file
             File.WriteAllText(jsonPath, json);
         }
+
+        /// <summary>
+        /// Converts XML exported block to CSV
+        /// Flattened tagname, type, offset
+        /// </summary>
+        public static void ConvertInterfaceToCSV(string xmlPath)
+        {
+            string csvPath = Path.ChangeExtension(xmlPath, ".csv");
+            // Load XML
+            XDocument doc = XDocument.Load(xmlPath);
+
+            // Find Interface node
+            XElement interfaceNode = doc.Descendants("Interface").FirstOrDefault();
+
+            if (interfaceNode == null)
+                throw new Exception("Interface node not found.");
+
+            // Siemens namespace
+            XNamespace ns =
+                "http://www.siemens.com/automation/Openness/SW/Interface/v5";
+
+            // Get Sections node
+            XElement sectionsNode = interfaceNode.Element(ns + "Sections");
+
+            if (sectionsNode == null)
+                throw new Exception("Sections node not found.");
+
+            // Build JSON object
+            var interfaceData = new
+            {
+                Sections = sectionsNode.Elements(ns + "Section")
+                    .Select(section => new
+                    {
+                        Name = (string)section.Attribute("Name"),
+
+                        Members = section.Elements(ns + "Member")
+                            .Select(m => ParseMember(m, ns))
+                            .ToList()
+                    })
+                    .ToList()
+            };
+
+            var csvLines = new List<string> { };
+
+            List<FlatTag> flatTags = GetFlatTags(interfaceData);
+
+            foreach (FlatTag flatTag in flatTags)
+            {
+                csvLines.Add(flatTag.GetCSVString());
+            }
+            
+            // Save file
+            File.WriteAllLines(csvPath, csvLines);
+        }
+
         private void btnFlattenDB_Click(object sender, EventArgs e)
         {
             PlcSoftware plcs = null;
@@ -1215,6 +1348,8 @@ namespace TIA_Project_Tool
             db.Export(new FileInfo(strExportPath), ExportOptions.WithDefaults | ExportOptions.WithReadOnly);
 
             ConvertInterfaceToJson(strExportPath);
+
+            ConvertInterfaceToCSV(strExportPath);
 
         }
 

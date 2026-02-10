@@ -134,6 +134,7 @@
     <Compile Include="frmProcessSelection.Designer.cs">
       <DependentUpon>frmProcessSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

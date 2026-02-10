@@ -55,29 +55,28 @@
             this.btnPaste = new System.Windows.Forms.Button();
             this.btnGenerateInstances = new System.Windows.Forms.Button();
             this.grpInstances = new System.Windows.Forms.GroupBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnRetrieveMasterCopies = new System.Windows.Forms.Button();
-            this.tvMasterCopies = new System.Windows.Forms.TreeView();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.btnFlattenDB = new System.Windows.Forms.Button();
-            this.btnRefreshDBFlattener = new System.Windows.Forms.Button();
-            this.tvDBFlattener = new System.Windows.Forms.TreeView();
             this.btnGenerateInstanceDBs = new System.Windows.Forms.Button();
             this.btnExportOrderNos = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tvDBFlattener = new System.Windows.Forms.TreeView();
+            this.btnRefreshDBFlattener = new System.Windows.Forms.Button();
+            this.btnFlattenDB = new System.Windows.Forms.Button();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tvMasterCopies = new System.Windows.Forms.TreeView();
+            this.btnRetrieveMasterCopies = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
             this.grpPortal.SuspendLayout();
             this.txt_Status.SuspendLayout();
             this.grpProject.SuspendLayout();
             this.grpDeviceSelection.SuspendLayout();
             this.grpInstances.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.tabPage3.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.tabControl1.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpPortal
@@ -357,106 +356,6 @@
             this.grpInstances.TabStop = false;
             this.grpInstances.Text = "Instances";
             // 
-            // tabControl1
-            // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Location = new System.Drawing.Point(456, 223);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(316, 306);
-            this.tabControl1.TabIndex = 10;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.groupBox1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(308, 280);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Master Copies";
-            this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.btnRetrieveMasterCopies);
-            this.groupBox1.Controls.Add(this.tvMasterCopies);
-            this.groupBox1.Location = new System.Drawing.Point(-4, -13);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(316, 306);
-            this.groupBox1.TabIndex = 6;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Master Copies";
-            // 
-            // btnRetrieveMasterCopies
-            // 
-            this.btnRetrieveMasterCopies.Location = new System.Drawing.Point(7, 20);
-            this.btnRetrieveMasterCopies.Name = "btnRetrieveMasterCopies";
-            this.btnRetrieveMasterCopies.Size = new System.Drawing.Size(75, 23);
-            this.btnRetrieveMasterCopies.TabIndex = 5;
-            this.btnRetrieveMasterCopies.Text = "Refresh";
-            this.btnRetrieveMasterCopies.UseVisualStyleBackColor = true;
-            this.btnRetrieveMasterCopies.Click += new System.EventHandler(this.btnRetrieveMasterCopies_Click_1);
-            // 
-            // tvMasterCopies
-            // 
-            this.tvMasterCopies.Location = new System.Drawing.Point(6, 49);
-            this.tvMasterCopies.Name = "tvMasterCopies";
-            this.tvMasterCopies.Size = new System.Drawing.Size(304, 251);
-            this.tvMasterCopies.TabIndex = 4;
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(308, 280);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Instance DBs";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // tabPage3
-            // 
-            this.tabPage3.Controls.Add(this.btnFlattenDB);
-            this.tabPage3.Controls.Add(this.btnRefreshDBFlattener);
-            this.tabPage3.Controls.Add(this.tvDBFlattener);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(308, 280);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "DB Flattener";
-            this.tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // btnFlattenDB
-            // 
-            this.btnFlattenDB.Location = new System.Drawing.Point(87, 6);
-            this.btnFlattenDB.Name = "btnFlattenDB";
-            this.btnFlattenDB.Size = new System.Drawing.Size(75, 23);
-            this.btnFlattenDB.TabIndex = 8;
-            this.btnFlattenDB.Text = "Flatten";
-            this.btnFlattenDB.UseVisualStyleBackColor = true;
-            this.btnFlattenDB.Click += new System.EventHandler(this.btnFlattenDB_Click);
-            // 
-            // btnRefreshDBFlattener
-            // 
-            this.btnRefreshDBFlattener.Location = new System.Drawing.Point(6, 6);
-            this.btnRefreshDBFlattener.Name = "btnRefreshDBFlattener";
-            this.btnRefreshDBFlattener.Size = new System.Drawing.Size(75, 23);
-            this.btnRefreshDBFlattener.TabIndex = 7;
-            this.btnRefreshDBFlattener.Text = "Refresh";
-            this.btnRefreshDBFlattener.UseVisualStyleBackColor = true;
-            this.btnRefreshDBFlattener.Click += new System.EventHandler(this.btnRefreshDBFlattener_Click);
-            // 
-            // tvDBFlattener
-            // 
-            this.tvDBFlattener.Location = new System.Drawing.Point(2, 35);
-            this.tvDBFlattener.Name = "tvDBFlattener";
-            this.tvDBFlattener.Size = new System.Drawing.Size(304, 245);
-            this.tvDBFlattener.TabIndex = 6;
-            // 
             // btnGenerateInstanceDBs
             // 
             this.btnGenerateInstanceDBs.Location = new System.Drawing.Point(13, 563);
@@ -487,6 +386,95 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Export";
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.btnFlattenDB);
+            this.tabPage3.Controls.Add(this.btnRefreshDBFlattener);
+            this.tabPage3.Controls.Add(this.tvDBFlattener);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(308, 280);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "DB Flattener";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // tvDBFlattener
+            // 
+            this.tvDBFlattener.Location = new System.Drawing.Point(2, 35);
+            this.tvDBFlattener.Name = "tvDBFlattener";
+            this.tvDBFlattener.Size = new System.Drawing.Size(304, 245);
+            this.tvDBFlattener.TabIndex = 6;
+            // 
+            // btnRefreshDBFlattener
+            // 
+            this.btnRefreshDBFlattener.Location = new System.Drawing.Point(6, 6);
+            this.btnRefreshDBFlattener.Name = "btnRefreshDBFlattener";
+            this.btnRefreshDBFlattener.Size = new System.Drawing.Size(75, 23);
+            this.btnRefreshDBFlattener.TabIndex = 7;
+            this.btnRefreshDBFlattener.Text = "Refresh";
+            this.btnRefreshDBFlattener.UseVisualStyleBackColor = true;
+            this.btnRefreshDBFlattener.Click += new System.EventHandler(this.btnRefreshDBFlattener_Click);
+            // 
+            // btnFlattenDB
+            // 
+            this.btnFlattenDB.Location = new System.Drawing.Point(87, 6);
+            this.btnFlattenDB.Name = "btnFlattenDB";
+            this.btnFlattenDB.Size = new System.Drawing.Size(75, 23);
+            this.btnFlattenDB.TabIndex = 8;
+            this.btnFlattenDB.Text = "Flatten";
+            this.btnFlattenDB.UseVisualStyleBackColor = true;
+            this.btnFlattenDB.Click += new System.EventHandler(this.btnFlattenDB_Click);
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.groupBox1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(308, 280);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Master Copies";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btnRetrieveMasterCopies);
+            this.groupBox1.Controls.Add(this.tvMasterCopies);
+            this.groupBox1.Location = new System.Drawing.Point(-4, -13);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(316, 306);
+            this.groupBox1.TabIndex = 6;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Master Copies";
+            // 
+            // tvMasterCopies
+            // 
+            this.tvMasterCopies.Location = new System.Drawing.Point(6, 49);
+            this.tvMasterCopies.Name = "tvMasterCopies";
+            this.tvMasterCopies.Size = new System.Drawing.Size(304, 251);
+            this.tvMasterCopies.TabIndex = 4;
+            // 
+            // btnRetrieveMasterCopies
+            // 
+            this.btnRetrieveMasterCopies.Location = new System.Drawing.Point(7, 20);
+            this.btnRetrieveMasterCopies.Name = "btnRetrieveMasterCopies";
+            this.btnRetrieveMasterCopies.Size = new System.Drawing.Size(75, 23);
+            this.btnRetrieveMasterCopies.TabIndex = 5;
+            this.btnRetrieveMasterCopies.Text = "Refresh";
+            this.btnRetrieveMasterCopies.UseVisualStyleBackColor = true;
+            this.btnRetrieveMasterCopies.Click += new System.EventHandler(this.btnRetrieveMasterCopies_Click_1);
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Location = new System.Drawing.Point(456, 223);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(316, 306);
+            this.tabControl1.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -513,11 +501,11 @@
             this.grpDeviceSelection.ResumeLayout(false);
             this.grpDeviceSelection.PerformLayout();
             this.grpInstances.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            this.tabPage3.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -543,12 +531,6 @@
         private System.Windows.Forms.Button btnPaste;
         private System.Windows.Forms.Button btnGenerateInstances;
         private System.Windows.Forms.GroupBox grpInstances;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button btnRetrieveMasterCopies;
-        private System.Windows.Forms.TreeView tvMasterCopies;
-        private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button btnGenerateInstanceDBs;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cmboInstanceType;
@@ -556,14 +538,19 @@
         private System.Windows.Forms.TextBox txtInstancePrefix;
         private System.Windows.Forms.ColumnHeader colInstanceName;
         private System.Windows.Forms.ColumnHeader colType;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.Button btnFlattenDB;
-        private System.Windows.Forms.Button btnRefreshDBFlattener;
-        private System.Windows.Forms.TreeView tvDBFlattener;
         private System.Windows.Forms.Button btnRefreshDevices;
         private System.Windows.Forms.Button btnExportOrderNos;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripStatusLabel lblVersion;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.Button btnFlattenDB;
+        private System.Windows.Forms.Button btnRefreshDBFlattener;
+        private System.Windows.Forms.TreeView tvDBFlattener;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnRetrieveMasterCopies;
+        private System.Windows.Forms.TreeView tvMasterCopies;
+        private System.Windows.Forms.TabControl tabControl1;
     }
 }
 
