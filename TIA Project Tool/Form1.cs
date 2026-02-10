@@ -1083,12 +1083,31 @@ namespace TIA_Project_Tool
 
         private static object ParseMember(XElement member, XNamespace ns)
         {
+            // Normal child members (Struct case)
+            var directChildren = member
+                .Elements(ns + "Member")
+                .Select(m => ParseMember(m, ns))
+                .ToList();
+
+            // UDT / Complex case: Member -> Sections -> Section -> Member
+            var sectionChildren = member
+                .Elements(ns + "Sections")
+                .Elements(ns + "Section")
+                .Elements(ns + "Member")
+                .Select(m => ParseMember(m, ns))
+                .ToList();
+
+            // Merge both
+            var allChildren = directChildren
+                .Concat(sectionChildren)
+                .ToList();
+
             return new
             {
                 Name = (string)member.Attribute("Name"),
                 Datatype = (string)member.Attribute("Datatype"),
-                Remanence = (string)member.Attribute("Remanence"),
-                Accessibility = (string)member.Attribute("Accessibility"),
+                //Remanence = (string)member.Attribute("Remanence"),
+                //Accessibility = (string)member.Attribute("Accessibility"),
 
                 Attributes = member
                     .Element(ns + "AttributeList")?
@@ -1098,11 +1117,7 @@ namespace TIA_Project_Tool
                         a => a.Value
                     ),
 
-                // Recursively get child members (for Structs)
-                Children = member
-                    .Elements(ns + "Member")
-                    .Select(m => ParseMember(m, ns))
-                    .ToList()
+                Children = allChildren.Any() ? allChildren : null
             };
         }
 
@@ -1190,6 +1205,12 @@ namespace TIA_Project_Tool
             PlcBlock db = getBlock(plcs, strDBPath);
 
             string strExportPath = @"C:\TIATool\export.xml";
+
+            if (File.Exists(strExportPath))
+            {
+                File.Delete(strExportPath);
+            }
+
             ExportOptions eo = new ExportOptions();
             db.Export(new FileInfo(strExportPath), ExportOptions.WithDefaults | ExportOptions.WithReadOnly);
 
